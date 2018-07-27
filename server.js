@@ -145,6 +145,50 @@ server.post('/api/actions', (req, res) => {
 });
 
 
+server.delete('/api/projects/:id', (req, res) => {
+        const id = req.params.id;
+        const request = dbproject.remove(id);
+
+        request.then(response => {
+                if(response===1) {
+                let responseObject ={};
+                responseObject.message = `Successfully deleted project with id ${id}`;
+
+                res.json(responseObject);
+                }
+
+                else res.status(404).json({ error: "The project with the specified ID does not exist." });
+        })
+
+        .catch(error => {
+        res.status(500).json({ error: "The project could not be removed" });
+        })
+
+  });
+
+server.delete('/api/actions/:id', (req, res) => {
+        const id = req.params.id;
+        const request = dbaction.remove(id);
+
+        request.then(response => {
+                if(response===1) {
+                let responseObject ={};
+                responseObject.message = `Successfully deleted action with id ${id}`;
+
+                res.json(responseObject);
+                }
+
+                else res.status(404).json({ error: "The action with the specified ID does not exist." });
+        })
+
+        .catch(error => {
+        res.status(500).json({ error: "The action could not be removed" });
+        })
+
+  });
+
+
+
 server.use(function(req, res) {
   res.status(404).send("Error: Wrong path, check url");
 });
