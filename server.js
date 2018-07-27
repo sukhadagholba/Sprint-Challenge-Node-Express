@@ -65,6 +65,31 @@ server.get('/api/projects/:id', (req, res) => {
 });
 
 
+server.get('/api/projects/:id/actions', (req, res) => {
+        const id = req.params.id;
+
+       const request = dbproject.getProjectActions(id);
+
+        request.then(response => {
+        if(response.length==0) res.status(404).json({ error: "The project with the specified ID does not exist" });
+         else {
+                response.unshift(" Actions for the specified project are:");
+                 res.status(200).json(response);
+         }
+
+        })
+
+        .catch(err => {
+        res.status(404).json({error: "The project  with the specified ID does not exist."});
+        })
+
+});
+
+
+
+
+
+
 server.get('/api/actions/:id', (req, res) => {
         const id = req.params.id;
  
