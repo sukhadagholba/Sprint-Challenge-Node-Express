@@ -78,16 +78,77 @@ server.get('/api/actions/:id', (req, res) => {
         if(response.length==0) res.status(404).json({ error: "The action with the specified ID does not exist." });
          else {
                  res.status(200).json(response);
-         }
-
-        })
+	 }
+	})
 
         .catch(err => {
         res.status(404).json({error: "The action with the specified ID does not exist."});
         })
-
-        }
+}
 });
+
+server.post('/api/projects', (req, res) => {
+
+        const {name, description, completed} = req.body;
+        const project = {name, description, completed};
+	console.log(req.body);
+
+        if (!name || !description || completed ==="") {
+                res.status(400).json({message: "Please provide name, description and completed status for the project."});
+        }
+        
+        else{
+        const request = dbproject.insert(project);
+
+        request.then(response => {
+                response.message ="Successfully added a new post";
+		res.status(201).json(response);
+        })
+
+        .catch(error => {
+        res.status(500).json({ message: "There was an error while saving the project to the database" });
+        })
+}  
+});
+
+server.post('/api/actions', (req, res) => {
+
+        //if(!req.body.notes) {
+	//const {project_id, description, completed} = req.body; 
+	//let {notes} = "";
+	//}
+
+	//else {
+        const {project_id, notes, description, completed} = req.body;
+        //console.log(req.body);
+	//}
+
+	const action = {project_id, notes, description, completed};
+
+        if (!project_id || !description || completed ==="" || !notes) {
+                res.status(400).json({message: "Please provide project_id, description and completed status for the action."});
+        }
+
+        else{
+        const request = dbaction.insert(action);
+
+        request.then(response => {
+                response.message ="Successfully added a new post";
+
+                res.status(201).json(response);
+        })
+
+        .catch(error => {
+        res.status(500).json({ message: "There was an error while saving the action to the database" });
+        })
+} 
+});
+
+
+server.use(function(req, res) {
+  res.status(404).send("Error: Wrong path, check url");
+});
+
 
 
 server.listen(8000, () => console.log('API running on port 8000'));
