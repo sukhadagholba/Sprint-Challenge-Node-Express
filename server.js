@@ -86,10 +86,6 @@ server.get('/api/projects/:id/actions', (req, res) => {
 });
 
 
-
-
-
-
 server.get('/api/actions/:id', (req, res) => {
         const id = req.params.id;
  
@@ -145,16 +141,10 @@ server.post('/api/actions', (req, res) => {
         }
 
 	else if (req.body.description.length>128) res.status(400).json({message: "Description for the project should be less than 128 characters"});
-        //if(!req.body.notes) {
-	//const {project_id, description, completed} = req.body; 
-	//let {notes} = "";
-	//}
 
 	else {
-        const {project_id, notes, description, completed} = req.body;
-        //console.log(req.body);
-	//}
 
+        const {project_id, notes, description, completed} = req.body;
 	const action = {project_id, notes, description, completed};
 
         if (!project_id || !description || completed ==="" || !notes) {
