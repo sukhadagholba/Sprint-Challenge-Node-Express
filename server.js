@@ -96,6 +96,8 @@ server.post('/api/projects', (req, res) => {
         if (!name || !description || completed ==="") {
                 res.status(400).json({message: "Please provide name, description and completed status for the project."});
         }
+
+	else if (description.length>128) res.status(400).json({message: "Description for the project should be less than 128 characters"});
         
         else{
         const request = dbproject.insert(project);
@@ -113,12 +115,17 @@ server.post('/api/projects', (req, res) => {
 
 server.post('/api/actions', (req, res) => {
 
+	if(isNaN(req.body.project_id)){
+        res.status(404).json({ error: "Project_id should be a number" });
+        }
+
+	else if (req.body.description.length>128) res.status(400).json({message: "Description for the project should be less than 128 characters"});
         //if(!req.body.notes) {
 	//const {project_id, description, completed} = req.body; 
 	//let {notes} = "";
 	//}
 
-	//else {
+	else {
         const {project_id, notes, description, completed} = req.body;
         //console.log(req.body);
 	//}
@@ -126,14 +133,14 @@ server.post('/api/actions', (req, res) => {
 	const action = {project_id, notes, description, completed};
 
         if (!project_id || !description || completed ==="" || !notes) {
-                res.status(400).json({message: "Please provide project_id, description and completed status for the action."});
+                res.status(400).json({message: "Please don't leave project_id, description and completed fields empty."});
         }
 
         else{
         const request = dbaction.insert(action);
 
         request.then(response => {
-                response.message ="Successfully added a new post";
+                response.message ="Successfully added a new action";
 
                 res.status(201).json(response);
         })
@@ -141,7 +148,8 @@ server.post('/api/actions', (req, res) => {
         .catch(error => {
         res.status(500).json({ message: "There was an error while saving the action to the database" });
         })
-} 
+}
+}
 });
 
 
@@ -186,6 +194,73 @@ server.delete('/api/actions/:id', (req, res) => {
         })
 
   });
+
+
+server.put('/api/projects/:id', (req, res) => {
+  const {name, description, completed} = req.body;
+
+  const id =  req.params.id;
+  const project = {name, description, completed}
+
+	if (!name || !description || completed ==="") {
+                res.status(400).json({message: "Please don't leave name, description and completed fields empty for the project."});
+        }
+
+        else if (description.length>128) res.status(400).json({message: "Description for the project should be less than 128 characters"});
+
+
+	else{
+ 	const request = dbproject.update(id, project);
+
+        request.then(response => {
+                if(response===0)  res.status(404).json({ message: "The project with the specified ID does not exist." });
+                else{ 
+                        //response.message= "Successfully updated the project with new information";
+                        res.status(200).json(response);
+                }
+        })
+
+        .catch(error => {
+        res.status(500).json({ message: "Couldn't update the project" });
+        })
+}       
+});
+
+
+
+server.put('/api/actions/:id', (req, res) => {
+  const {project_id, description, completed, notes} = req.body;
+
+  const id =  req.params.id;
+  const action = {project_id, description, completed, notes}
+
+
+	if (!project_id || !description || completed ==="" || !notes) {
+                res.status(400).json({message: "Please don't leave project_id, description and completed fields empty for the action."});
+        }
+
+        else if (description.length>128) res.status(400).json({message: "Description for the action should be less than 128 characters"});
+
+	else if (isNaN(project_id)) res.status(400).json({message: "project_id should be a number"});
+
+	else{
+ 	const request = dbaction.update(id, action);
+
+
+        request.then(response => {
+                if(response===0)  res.status(404).json({ message: "The action with the specified ID does not exist." });
+                else{
+                        response.message= "Successfully updated the action";
+                        res.status(200).json(response);
+                }
+        })
+
+        .catch(err => {
+        res.status(500).json({ message: "Couldn't update the action" });
+        })
+}
+});
+
 
 
 
